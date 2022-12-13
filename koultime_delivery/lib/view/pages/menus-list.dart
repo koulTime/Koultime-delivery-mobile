@@ -1,8 +1,9 @@
 import 'dart:ffi';
-
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:koultime_delivery/services/items-services.dart';
 import 'package:koultime_delivery/view/pages/cart.dart';
 import 'package:koultime_delivery/view/widgets/menu-card.dart';
 
@@ -14,15 +15,46 @@ class MenuList extends StatefulWidget {
 }
 
 class _MenuListState extends State<MenuList> {
-  var types = [
-    {"name": "All", "selected": true},
-    {"name": "Pizza", "selected": false},
-    {"name": "Sandwich", "selected": false},
-    {"name": "Pasta", "selected": false},
-    {"name": "Drinks", "selected": false}
-  ];
+  late List<dynamic> items;
+  late bool loading = true;
+  late String selectedCateg = "";
+  late Set<String> categories = {};
+
+  void getItems() async {
+    print("get items");
+    ItemService service = ItemService();
+
+    List<dynamic> list = await service.getItems();
+    Set<String> cat = {};
+    if (mounted) {
+      setState(() {
+        items = list;
+        loading = false;
+      });
+
+      Future.delayed(const Duration(milliseconds: 500), () {
+        for (int i = 0; i < list.length; i++) {
+          cat.add(list[i]['category']);
+        }
+        setState(() {
+          selectedCateg = cat.elementAt(0);
+          categories = cat;
+        });
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getItems();
+  }
+
   @override
   Widget build(BuildContext context) {
+    /*  Timer mytimer = Timer.periodic(Duration(seconds: 2), (timer) {
+      getItems();
+    });*/
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(
@@ -75,50 +107,82 @@ class _MenuListState extends State<MenuList> {
             SizedBox(
               height: 20,
             ),
-            Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                    types.length,
-                    (index) => Row(
-                          // crossAxisAlignment: CrossAxisAlignment.center,
+            Container(
+                height: 50,
+                width: MediaQuery.of(context).size.width,
+                //crossAxisAlignment: CrossAxisAlignment.center,
+                //mainAxisAlignment: MainAxisAlignment.center,
+                child: ListView.builder(
+                  itemCount: categories.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (BuildContext context, int index) {
+                    return TextButton(
+                      onPressed: () {
+                        setState(() {
+                          print(categories.elementAt(index));
+                          selectedCateg = categories.elementAt(index);
+                        });
+                      },
+                      child: (Row(
+                        // crossAxisAlignment: CrossAxisAlignment.center,
 
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.all(8),
-                              padding: EdgeInsets.only(right: 12, left: 12),
-                              height: 23,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: types[index]["selected"] == true
-                                    ? Colors.red
-                                    : Colors.white,
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    types[index]["name"].toString(),
-                                    style: TextStyle(
-                                        color: types[index]["selected"] == true
-                                            ? Colors.white
-                                            : Colors.black),
-                                  ),
-                                ],
-                              ),
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.all(8),
+                            padding: EdgeInsets.only(right: 12, left: 12),
+                            height: 23,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color:
+                                  categories.elementAt(index) == selectedCateg
+                                      ? Colors.red
+                                      : Colors.white,
                             ),
-                          ],
-                        ))),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  categories.elementAt(index),
+                                  style: TextStyle(
+                                      color: categories.elementAt(index) ==
+                                              selectedCateg
+                                          ? Colors.white
+                                          : Colors.black),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )),
+                    );
+                  },
+                )),
             const SizedBox(
               height: 20,
             ),
-            Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 0.6,
-                child: ListView.builder(
-                    itemCount: 5,
-                    itemBuilder: (context, index) => MenuCard(cart: false)))
+            loading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: ListView.builder(
+                        itemCount: items.length,
+                        itemBuilder: (context, index) =>
+                            selectedCateg == items[index]['category']
+                                ? MenuCard(
+                                    index: -1,
+                                    cart: false,
+                                    imagePath: items[index]['imagePath'],
+                                    name: items[index]['name'],
+                                    available: items[index]['available'],
+                                    description: items[index]['description'],
+                                    rate: items[index]['rate'],
+                                    price: items[index]['price'],
+                                  )
+                                : Container()))
           ],
         ),
       ),

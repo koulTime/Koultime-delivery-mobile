@@ -1,10 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:koultime_delivery/data/menu-item.dart';
+import 'package:koultime_delivery/services/items-services.dart';
 
 class MenuCard extends StatefulWidget {
   final bool cart;
-  const MenuCard({super.key, required this.cart});
+
+  final String name;
+  final String description;
+  final int price;
+  final int rate;
+  final String imagePath;
+  final bool available;
+  final int index;
+  const MenuCard(
+      {super.key,
+      required this.cart,
+      required this.index,
+      required this.name,
+      required this.description,
+      required this.price,
+      required this.rate,
+      required this.imagePath,
+      required this.available});
 
   @override
   State<MenuCard> createState() => _MenuCardState();
@@ -49,10 +68,13 @@ class _MenuCardState extends State<MenuCard> {
             Row(
               children: [
                 Container(
-                  width: 80,
-                  height: 72,
-                  color: Colors.grey,
-                ),
+                    width: 80,
+                    height: 72,
+                    color: Colors.grey,
+                    child: Image(
+                      image: NetworkImage(widget.imagePath),
+                      fit: BoxFit.fill,
+                    )),
                 SizedBox(
                   width: 10,
                 ),
@@ -61,35 +83,45 @@ class _MenuCardState extends State<MenuCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                        padding: EdgeInsets.only(bottom: 10),
-                        child: Text(
-                          "TITLE",
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        )),
+                      width: 140,
+                      padding: EdgeInsets.only(bottom: 2),
+                      child: Text(
+                        widget.name,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 13),
+                      ),
+                    ),
                     Row(
-                      children: [
-                        Icon(
+                        children: List.generate(
+                      5,
+                      (index) => Icon(
+                        Icons.star,
+                        size: 10,
+                        color:
+                            index < widget.rate ? Colors.yellow : Colors.grey,
+                      ),
+                    )),
+                    Container(
+                        width: 130,
+                        padding: EdgeInsets.only(bottom: 0, top: 4),
+                        child: Text(widget.description,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w300, fontSize: 10))),
+                    /* Row(
+                      children: List.generate(
+                        5,
+                        (index) => Icon(
                           Icons.star,
-                          color: Colors.yellow,
+                          size: 18,
+                          color:
+                              index < widget.rate ? Colors.yellow : Colors.grey,
                         ),
-                        Icon(
-                          Icons.star,
-                          color: Colors.yellow,
-                        ),
-                        Icon(
-                          Icons.star,
-                          color: Colors.yellow,
-                        ),
-                        Icon(
-                          Icons.star,
-                          color: Colors.grey.shade300,
-                        ),
-                        Icon(
-                          Icons.star,
-                          color: Colors.grey.shade300,
-                        )
-                      ],
-                    )
+                      ),
+                    )*/
                   ],
                 ),
               ],
@@ -102,24 +134,70 @@ class _MenuCardState extends State<MenuCard> {
                     height: 17,
                   ),
                   Text(
-                    "50.00 Dt",
+                    "${widget.price}.00 Dt",
                     style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                   widget.cart
-                      ? ElevatedButton(
+                      ? GetBuilder<AddToCart>(
+                          init: AddToCart(),
+                          builder: (value) => ElevatedButton(
+                              onPressed: (() {
+                                value.del(widget.index);
+                              }),
+                              style: const ButtonStyle(
+                                backgroundColor:
+                                    MaterialStatePropertyAll<Color>(Colors.red),
+                              ),
+                              child: const Text(
+                                "Remove",
+                                style: TextStyle(fontSize: 10),
+                              )))
+                      : GetBuilder<AddToCart>(
+                          init: AddToCart(),
+                          builder: (value) => ElevatedButton(
+                              onPressed: (() async {
+                                value.add(Item(
+                                    name: widget.name,
+                                    description: widget.description,
+                                    price: widget.price,
+                                    rate: widget.rate,
+                                    imagePath: widget.imagePath,
+                                    category: "",
+                                    available: widget.available));
+
+                                await Fluttertoast.showToast(
+                                    msg: '${widget.name} Added to the Cart',
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                    backgroundColor: Colors.grey,
+                                    textColor: Colors.white);
+                              }),
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStatePropertyAll<Color>(
+                                        widget.available == false
+                                            ? Colors.grey
+                                            : Colors.black),
+                              ),
+                              child: Text(
+                                widget.available == false
+                                    ? "N/A"
+                                    : "Add to cart",
+                                style: TextStyle(fontSize: 10),
+                              )),
+                        )
+
+                  /*    ElevatedButton(
                           onPressed: (() {}),
-                          style: const ButtonStyle(
-                            backgroundColor:
-                                MaterialStatePropertyAll<Color>(Colors.red),
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStatePropertyAll<Color>(
+                                widget.available == false
+                                    ? Colors.grey
+                                    : Colors.red),
                           ),
-                          child: const Text("Remove"))
-                      : ElevatedButton(
-                          onPressed: (() {}),
-                          style: const ButtonStyle(
-                            backgroundColor:
-                                MaterialStatePropertyAll<Color>(Colors.red),
-                          ),
-                          child: const Text("Add to cart"))
+                          child: Text(widget.available == false
+                              ? "N/A"
+                              : "Add to cart"))*/
                 ]),
           ]),
     );

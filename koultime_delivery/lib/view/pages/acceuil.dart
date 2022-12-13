@@ -16,13 +16,13 @@ class Acceuil extends StatelessWidget {
           color: Colors.white,
           child: Container(
               width: MediaQuery.of(context).size.width,
-              margin: const EdgeInsets.only(bottom: 180),
+              margin: const EdgeInsets.only(bottom: 190),
               child: Image.asset("assets/logo.PNG")),
         ),
         Container(
-          height: MediaQuery.of(context).size.height * 0.45,
+          height: MediaQuery.of(context).size.height * 0.48,
           decoration: const BoxDecoration(
-              color: Colors.red,
+              color: Colors.black, //Colors.red,
               borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(50), topRight: Radius.circular(50))),
           child: Padding(
@@ -40,7 +40,7 @@ class Acceuil extends StatelessWidget {
                           decoration: TextDecoration.none,
                           color: Colors.white,
                           fontWeight: FontWeight.w900,
-                          fontSize: 35),
+                          fontSize: 32),
                     )),
                     SizedBox(height: 5),
                     Center(
@@ -58,6 +58,8 @@ class Acceuil extends StatelessWidget {
                 Container(
                   height: 50,
                   width: MediaQuery.of(context).size.width * 0.8,
+                  decoration:
+                      BoxDecoration(border: Border.all(color: Colors.white)),
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.push(context, MaterialPageRoute(builder: (_) {

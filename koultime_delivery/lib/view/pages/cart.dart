@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:get/get.dart';
+import 'package:koultime_delivery/services/items-services.dart';
 import 'package:koultime_delivery/view/widgets/menu-card.dart';
 
 class Cart extends StatefulWidget {
@@ -11,6 +11,7 @@ class Cart extends StatefulWidget {
 }
 
 class _CartState extends State<Cart> {
+  int delivery = 2;
   @override
   Widget build(BuildContext context) {
     var orders = {};
@@ -24,7 +25,7 @@ class _CartState extends State<Cart> {
               color: Colors.transparent,
             )
           ],
-          iconTheme: IconThemeData(
+          iconTheme: const IconThemeData(
             color: Colors.black, //change your color here
           ),
           title: const Center(
@@ -34,20 +35,36 @@ class _CartState extends State<Cart> {
           ))),
       body: Column(
         children: [
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Container(
             height: MediaQuery.of(context).size.height * 0.55,
-            child: ListView.builder(
-                itemCount: 3,
-                itemBuilder: ((context, index) => MenuCard(cart: true))),
+            child: GetBuilder<AddToCart>(
+              init: AddToCart(),
+              builder: (value) {
+                return ListView.builder(
+                    itemCount: value.lst.length,
+                    itemBuilder: (context, index) {
+                      return MenuCard(
+                        cart: true,
+                        index: index,
+                        imagePath: value.lst[index].imagePath,
+                        name: value.lst[index].name,
+                        available: value.lst[index].available,
+                        description: value.lst[index].description,
+                        rate: value.lst[index].rate,
+                        price: value.lst[index].price,
+                      );
+                    });
+              },
+            ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Container(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             width: MediaQuery.of(context).size.width * 0.8,
             //height: 50,
             decoration: BoxDecoration(
@@ -57,67 +74,86 @@ class _CartState extends State<Cart> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     "Item Total",
                     style: TextStyle(fontSize: 15),
                   ),
-                  Text(
-                    "150 Dt",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-                  ),
+                  GetBuilder<AddToCart>(
+                      init: AddToCart(),
+                      builder: (value) {
+                        return Text(
+                          "${value.cost} Dt",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 15),
+                        );
+                      })
                 ],
               ),
-              Divider(
+              const Divider(
                 color: Colors.grey,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     "Delivery",
                     style: TextStyle(fontSize: 15),
                   ),
-                  Text(
-                    "2 Dt",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-                  ),
+                  GetBuilder<AddToCart>(
+                      init: AddToCart(),
+                      builder: (value) {
+                        return Text(
+                          "${value.cost == 0 ? 0 : delivery} Dt",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 15),
+                        );
+                      }),
                 ],
               ),
-              Divider(
+              const Divider(
                 color: Colors.grey,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     "Total",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
                   ),
-                  Text(
-                    "152 Dt",
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
-                  ),
+                  GetBuilder<AddToCart>(
+                      init: AddToCart(),
+                      builder: (value) {
+                        return Text(
+                          "${value.cost + (value.cost == 0 ? 0 : delivery)} Dt",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 20),
+                        );
+                      })
                 ],
               ),
             ]),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          Container(
-            height: 50,
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: ElevatedButton(
-              onPressed: () {},
-              style: const ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll<Color>(Colors.black),
-              ),
-              child: Text(
-                "Make an order",
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
-          )
+          SizedBox(
+              height: 50,
+              width: MediaQuery.of(context).size.width * 0.8,
+              child: GetBuilder<AddToCart>(
+                  init: AddToCart(),
+                  builder: (value) {
+                    return ElevatedButton(
+                      onPressed: () {},
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStatePropertyAll<Color>(
+                            value.lst.isEmpty ? Colors.grey : Colors.black),
+                      ),
+                      child: const Text(
+                        "Make an order",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    );
+                  }))
         ],
       ),
     );
