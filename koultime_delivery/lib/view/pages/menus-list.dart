@@ -21,7 +21,6 @@ class _MenuListState extends State<MenuList> {
   late Set<String> categories = {};
 
   void getItems() async {
-    print("get items");
     ItemService service = ItemService();
 
     List<dynamic> list = await service.getItems();
@@ -119,7 +118,6 @@ class _MenuListState extends State<MenuList> {
                     return TextButton(
                       onPressed: () {
                         setState(() {
-                          print(categories.elementAt(index));
                           selectedCateg = categories.elementAt(index);
                         });
                       },

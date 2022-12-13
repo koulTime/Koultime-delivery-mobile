@@ -30,14 +30,10 @@ class ItemService {
         "address": 'Rue habib borguiba'
       };
       Map<String, String> customHeaders = {"content-type": "application/json"};
-  
+
       var response =
           await http.post(url, headers: customHeaders, body: json.encode(body));
-
-      print("response : ${response.body}");
-    } catch (e) {
-      print("response : $e");
-    }
+    } catch (e) {}
   }
 }
 
