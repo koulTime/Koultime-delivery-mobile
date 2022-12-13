@@ -174,6 +174,7 @@ class _MenuListState extends State<MenuList> {
                             selectedCateg == items[index]['category']
                                 ? MenuCard(
                                     index: -1,
+                                    id: items[index]['id'],
                                     cart: false,
                                     imagePath: items[index]['imagePath'],
                                     name: items[index]['name'],

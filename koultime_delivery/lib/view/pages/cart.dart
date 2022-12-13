@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:koultime_delivery/services/items-services.dart';
 import 'package:koultime_delivery/view/widgets/menu-card.dart';
@@ -49,6 +50,7 @@ class _CartState extends State<Cart> {
                       return MenuCard(
                         cart: true,
                         index: index,
+                        id: value.lst[index].id,
                         imagePath: value.lst[index].imagePath,
                         name: value.lst[index].name,
                         available: value.lst[index].available,
@@ -143,7 +145,16 @@ class _CartState extends State<Cart> {
                   init: AddToCart(),
                   builder: (value) {
                     return ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        await ItemService().makeOrder(value.ids);
+                        value.delAll();
+                        await Fluttertoast.showToast(
+                            msg: 'Your order is sent ',
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            backgroundColor: Colors.green,
+                            textColor: Colors.white);
+                      },
                       style: ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll<Color>(
                             value.lst.isEmpty ? Colors.grey : Colors.black),

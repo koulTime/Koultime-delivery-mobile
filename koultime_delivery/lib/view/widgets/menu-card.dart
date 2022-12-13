@@ -14,6 +14,7 @@ class MenuCard extends StatefulWidget {
   final String imagePath;
   final bool available;
   final int index;
+  final int id;
   const MenuCard(
       {super.key,
       required this.cart,
@@ -23,7 +24,8 @@ class MenuCard extends StatefulWidget {
       required this.price,
       required this.rate,
       required this.imagePath,
-      required this.available});
+      required this.available,
+      required this.id});
 
   @override
   State<MenuCard> createState() => _MenuCardState();
@@ -157,6 +159,7 @@ class _MenuCardState extends State<MenuCard> {
                           builder: (value) => ElevatedButton(
                               onPressed: (() async {
                                 value.add(Item(
+                                    id: widget.id,
                                     name: widget.name,
                                     description: widget.description,
                                     price: widget.price,

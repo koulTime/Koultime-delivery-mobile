@@ -20,19 +20,48 @@ class ItemService {
       return [];
     }
   }
+
+  Future<void> makeOrder(List<int> itemsList) async {
+    try {
+      var url = Uri.parse("http://44.202.155.192:4001/online-order");
+      Map body = {
+        "type": "online",
+        "orderedItems": itemsList.toString(),
+        "address": 'Rue habib borguiba'
+      };
+      Map<String, String> customHeaders = {"content-type": "application/json"};
+  
+      var response =
+          await http.post(url, headers: customHeaders, body: json.encode(body));
+
+      print("response : ${response.body}");
+    } catch (e) {
+      print("response : $e");
+    }
+  }
 }
 
 class AddToCart extends GetxController {
   List<Item> lst = [];
   int cost = 0;
+  List<int> ids = [];
   add(Item menuItem) {
     lst.add(menuItem);
+    ids.add(menuItem.id);
     cost += menuItem.price;
     update();
   }
 
   del(int index) {
     lst.removeAt(index);
+    ids.removeAt(index);
+    update();
+  }
+
+  delAll() {
+    lst.clear();
+    ids.clear();
+    cost = 0;
     update();
   }
 }

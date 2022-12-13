@@ -1,4 +1,5 @@
 class Item {
+  int id;
   String name;
   String description;
   int price;
@@ -9,6 +10,7 @@ class Item {
 
   Item(
       {required this.name,
+      required this.id,
       required this.description,
       required this.price,
       required this.rate,
